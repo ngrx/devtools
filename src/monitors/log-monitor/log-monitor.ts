@@ -25,6 +25,10 @@ import {LogMonitorButton} from './log-monitor-button';
       direction: ltr;
     }
 
+     :host:first-child .title-bar {
+       opacity: .6; cursor: auto;
+     }
+
     .button-bar{
       text-align: center;
       border-bottom-width: 1px;
@@ -48,11 +52,11 @@ import {LogMonitorButton} from './log-monitor-button';
   `],
   template: `
     <div class="button-bar">
-      <log-monitor-button (action)="handleReset()" [disabled]="canReset$ | async">
+      <log-monitor-button (action)="handleReset()" [disabled]="canRevert$ | async">
         Reset
       </log-monitor-button>
 
-      <log-monitor-button (action)="handleRollback()">
+      <log-monitor-button (action)="handleRollback() [disabled]="canRevert$ | async"">
         Revert
       </log-monitor-button>
 
@@ -108,12 +112,14 @@ export class LogMonitor{
           });
         }
 
-        return actions.slice(1);
+        return actions;
       });
   }
 
   handleToggle(id: number){
-    this.devtools.toggleAction(id);
+    if (id > 0) {
+      this.devtools.toggleAction(id);
+    }
   }
 
   handleReset(){
