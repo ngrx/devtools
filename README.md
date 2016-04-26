@@ -6,6 +6,9 @@
 
 Devtools for @ngrx projects.
 
+## Installation
+`npm install @ngrx/devtools --save-dev`
+
 ## Available Devtools
 ### @ngrx/store Instrumentation
 To instrument your @ngrx/store and use the devtools, simply call `instrumentStore()` after you call `provideStore()` then use the `Devtools` component:
