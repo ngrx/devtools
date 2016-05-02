@@ -1,5 +1,5 @@
 import {Subject} from 'rxjs/Subject';
-import {BehaviorSubject} from 'rxjs/subject/BehaviorSubject';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {Observer} from 'rxjs/Observer';
 import 'rxjs/add/operator/let';
 import 'rxjs/add/operator/scan';
@@ -8,7 +8,7 @@ import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/filter';
 
 import {Dispatcher, Middleware, Reducer} from '@ngrx/store';
-import {ActionTypes} from '@ngrx/store/dist/store-backend';
+import {ActionTypes} from '@ngrx/store/store-backend';
 import {liftReducerWith, LiftedState} from './reducer';
 import {StoreDevtoolActions as actions} from './actions';
 import {liftAction, unliftState} from './utils';

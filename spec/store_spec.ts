@@ -2,7 +2,7 @@ declare var describe, it, expect, hot, cold, expectObservable, expectSubscriptio
 require('es6-shim');
 require('reflect-metadata');
 import {Observable} from 'rxjs/Observable';
-import {Injector, provide} from 'angular2/core';
+import {ReflectiveInjector, provide} from 'angular2/core';
 import {Dispatcher, provideStore, Store, StoreBackend} from '@ngrx/store';
 
 import { StoreDevtools, instrumentStore } from '../src';
@@ -38,7 +38,7 @@ describe('instrument', () => {
   let devtools: StoreDevtools;
 
   function createStore(reducer, monitorReducer = T => T){
-    const injector = Injector.resolveAndCreate([
+    const injector = ReflectiveInjector.resolveAndCreate([
       provideStore(reducer),
       instrumentStore(monitorReducer)
     ]);
@@ -56,7 +56,7 @@ describe('instrument', () => {
   });
 
   it('should alias devtools to the store backend', () => {
-    const injector = Injector.resolveAndCreate([
+    const injector = ReflectiveInjector.resolveAndCreate([
       provideStore(counter),
       instrumentStore()
     ]);

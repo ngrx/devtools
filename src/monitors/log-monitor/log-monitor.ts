@@ -66,7 +66,7 @@ import {LogMonitorButton} from './log-monitor-button';
     </div>
     <div class="elements">
       <log-monitor-entry
-        *ngFor="#item of (items$ | async)"
+        *ngFor="let item of (items$ | async)"
         [item]="item"
         (toggle)="handleToggle($event.id)">
       </log-monitor-entry>
