@@ -1,4 +1,4 @@
-import {provide, Provider, OpaqueToken} from 'angular2/core';
+import {provide, Provider, OpaqueToken} from '@angular/core';
 import * as store from '@ngrx/store';
 
 import {StoreDevtools} from './devtools';

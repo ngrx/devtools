@@ -2,7 +2,7 @@ declare var describe, it, expect, hot, cold, expectObservable, expectSubscriptio
 require('es6-shim');
 require('reflect-metadata');
 import {Observable} from 'rxjs/Observable';
-import {ReflectiveInjector, provide} from 'angular2/core';
+import {ReflectiveInjector, provide} from '@angular/core';
 import {Dispatcher, provideStore, Store, StoreBackend} from '@ngrx/store';
 
 import { StoreDevtools, instrumentStore } from '../src';

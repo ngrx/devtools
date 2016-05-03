@@ -7,7 +7,7 @@ import {
   EventEmitter,
   HostListener,
   HostBinding
-} from 'angular2/core';
+} from '@angular/core';
 
 @Component({
   selector: 'log-monitor-button',

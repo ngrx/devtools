@@ -3,7 +3,7 @@ import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/distinctUntilChanged';
 import {StoreDevtools} from '../../store/devtools';
-import {Component, ChangeDetectionStrategy, Input} from 'angular2/core';
+import {Component, ChangeDetectionStrategy, Input} from '@angular/core';
 import {Subject} from 'rxjs/Subject';
 import {Observable} from 'rxjs/Observable';
 import {Subscription} from 'rxjs/Subscription';

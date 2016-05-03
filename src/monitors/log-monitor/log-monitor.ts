@@ -1,4 +1,4 @@
-import {Inject, Component, ViewEncapsulation, ChangeDetectionStrategy} from 'angular2/core';
+import {Inject, Component, ViewEncapsulation, ChangeDetectionStrategy} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 

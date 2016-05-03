@@ -6,7 +6,7 @@ import {
   Output,
   EventEmitter,
   HostListener
-} from 'angular2/core';
+} from '@angular/core';
 
 import {LogEntryItem} from './log-entry-item';
 import {LogMonitorButton} from './log-monitor-button';

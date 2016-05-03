@@ -1,4 +1,4 @@
-import {Component, HostListener, HostBinding, Input} from 'angular2/core';
+import {Component, HostListener, HostBinding, Input} from '@angular/core';
 import {PositionsType} from './reducer';
 
 

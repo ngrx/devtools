@@ -1,6 +1,6 @@
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/map';
-import {Component, Input, Output, Injectable, Renderer} from 'angular2/core';
+import {Component, Input, Output, Injectable, Renderer} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {Subject} from 'rxjs/Subject';
 import {Subscriber} from 'rxjs/Subscriber';

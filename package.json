@@ -40,9 +40,8 @@
   },
   "homepage": "https://github.com/ngrx/devtools#readme",
   "devDependencies": {
-    "rxjs": "^5.0.0-beta.6",
-    "angular2": "^2.0.0-beta.17",
-    "@ngrx/store": "^1.4.0",
+    "@angular/core": "^2.0.0-rc.0",
+    "@ngrx/store": "^1.5.0",
     "es6-promise": "^3.0.2",
     "es6-shim": "^0.33.13",
     "jasmine": "^2.4.1",
@@ -50,15 +49,16 @@
     "lodash": "^3.10.1",
     "reflect-metadata": "^0.1.2",
     "rimraf": "^2.5.1",
+    "rxjs": "^5.0.0-beta.6",
     "tslint": "^3.4.0",
     "typescript": "^1.8.7",
     "typings": "^0.6.6",
-    "zone.js": "^0.5.15"
+    "zone.js": "^0.6.12"
   },
   "peerDependencies": {
+    "@angular/core": "^2.0.0-rc.0",
     "rxjs": "^5.0.0-beta.6",
-    "angular2": "^2.0.0-beta.17",
-    "@ngrx/store": "^1.4.0"
+    "@ngrx/store": "^1.5.0"
   },
   "typings": "./dist/index.d.ts"
 }

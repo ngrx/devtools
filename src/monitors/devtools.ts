@@ -1,4 +1,4 @@
-import {Component, Input} from 'angular2/core';
+import {Component, Input} from '@angular/core';
 import {LogMonitor} from './log-monitor/log-monitor';
 import {DockMonitor} from './dock-monitor/dock-monitor';
 
