@@ -5,6 +5,7 @@ export const ActionTypes = {
   COMMIT: 'COMMIT',
   SWEEP: 'SWEEP',
   TOGGLE_ACTION: 'TOGGLE_ACTION',
+  SET_ACTIONS_ACTIVE: 'SET_ACTIONS_ACTIVE',
   JUMP_TO_STATE: 'JUMP_TO_STATE',
   IMPORT_STATE: 'IMPORT_STATE'
 };
@@ -20,6 +21,7 @@ export const StoreDevtoolActions = {
         'Have you misspelled a constant?'
       );
     }
+
     return { type: ActionTypes.PERFORM_ACTION, action, timestamp: Date.now() };
   },
 
@@ -41,6 +43,10 @@ export const StoreDevtoolActions = {
 
   toggleAction(id) {
     return { type: ActionTypes.TOGGLE_ACTION, id };
+  },
+
+  setActionsActive(start, end, active = true) {
+    return { type: ActionTypes.SET_ACTIONS_ACTIVE, start, end, active };
   },
 
   jumpToState(index) {

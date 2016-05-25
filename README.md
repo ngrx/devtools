@@ -1,61 +1,43 @@
-# @ngrx/devtools
+# @ngrx/store-devtools
 
 [![Join the chat at https://gitter.im/ngrx/store](https://badges.gitter.im/ngrx/store.svg)](https://gitter.im/ngrx/store?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[ ![Codeship Status for ngrx/devtools](https://img.shields.io/codeship/888d1230-c7dd-0133-9ded-4eb1cc5240c5/master.svg)](https://codeship.com/projects/121789)
 [![npm version](https://badge.fury.io/js/%40ngrx%2Fdevtools.svg)](https://badge.fury.io/js/%40ngrx%2Fdevtools)
 
-Devtools for @ngrx projects.
-
-## Devtools have not yet been updated for @ngrx/store v2.0. An update is forthcoming.
+Devtools for [@ngrx/store](https://github.com/ngrx/store).
 
 ## Installation
-`npm install @ngrx/devtools --save-dev`
+`npm install @ngrx/store-devtools --save-dev`
 
-## Available Devtools
-### @ngrx/store Instrumentation
-To instrument your @ngrx/store and use the devtools, simply call `instrumentStore()` after you call `provideStore()` then use the `Devtools` component:
+### Instrumentation
+To instrument @ngrx/store and use the devtools, you will need to setup the instrumentation providers using the `instrumentStore` helper function.
 
-```ts
-import {Devtools, instrumentStore} from '@ngrx/devtools';
-
-@Component({
-	selector: 'app',
-	providers: [
-		provideStore(reducer),
-		instrumentStore()
-	],
-	directives: [ Devtools ],
-	template: `
-		<ngrx-devtools></ngrx-devtools>
-	`
-})
-export class App{ ... }
-```
-
-### Customization
-To customize the default layout for the devtools, import the `devtoolsConfig` function, add it to providers with an object with  `position` (top, bottom, left, right), `size` (0.3) and `visible` (true).
-To set different commands for toggling dock visibility and position, use the `toggle-command` (ctrl-h) and `position-command` (ctrl-m) inputs on the `ngrx-devtools` component:
+Here is an example configuration that uses  [@ngrx/store-log-monitor](https://github.com/ngrx/store-log-monitor)
 
 ```ts
-import {Devtools, instrumentStore, devtoolsConfig} from '@ngrx/devtools';
+import {instrumentStore} from '@ngrx/store-devtools';
+import {LogMonitor, useLogMonitor} from '@ngrx/store-log-monitor';
 
 @Component({
-	providers: [
-		instrumentStore(),
-		devtoolsConfig({
-			position: 'bottom',
-			visible: false,
-			size: 0.3
-		})
-	],
-	directives: [ Devtools ],
-	template: `
-		<ngrx-devtools toggle-command="ctrl-k" position-command="ctrl-e"></ngrx-devtools>
-	`
+  selector: 'app',
+  providers: [
+    provideStore(reducer),
+    instrumentStore({
+      monitor: useLogMonitor({
+        // Default log monitor options
+        position: 'right',
+        visible: true,
+        size: 0.3
+      })
+    })
+  ],
+  directives: [ LogMonitor ],
+  template: `
+    <ngrx-store-log-monitor></ngrx-store-log-monitor>
+  `
 })
-export class App{ ... }
+export class App { ... }
 ```
 
 ## Contributing
 
-Please read [contributing guidelines here](https://github.com/ngrx/devtools/blob/master/CONTRIBUTING.md).
+Please read [contributing guidelines here](https://github.com/ngrx/store-devtools/blob/master/CONTRIBUTING.md).

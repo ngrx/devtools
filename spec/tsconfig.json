@@ -1,16 +1,19 @@
 {
-	"compilerOptions": {
-		"target": "ES5",
-		"emitDecoratorMetadata": true,
-		"experimentalDecorators": true,
-		"module": "commonjs",
-		"moduleResolution": "node",
-		"outDir": "../tmp"
-	},
-	"files": [
-    "../typings/main.d.ts",
-		"helpers/test-helper.ts",
-		"store_spec.ts",
-		"config_spec.ts"
-	]
+  "compileOnSave": false,
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "sourceMap": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "declaration": false
+  },
+  "files": [
+    "../typings/index.d.ts",
+    "store.spec.ts"
+  ],
+  "atom": {
+    "rewriteTsconfig": true
+  }
 }

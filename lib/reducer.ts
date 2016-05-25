@@ -1,10 +1,21 @@
-import {Action} from '@ngrx/store';
+import { Action, Dispatcher, Reducer } from '@ngrx/store';
 
-import {difference, liftAction} from './utils';
-import {ActionTypes, StoreDevtoolActions} from './actions';
+import { difference, liftAction } from './utils';
+import { ActionTypes } from './actions';
 
 
-export const INIT_ACTION = { type: '@@ngrx/INIT' };
+export const INIT_ACTION = { type: Dispatcher.INIT };
+
+export interface LiftedState {
+  monitorState: any;
+  nextActionId: number;
+  actionsById: { [id: number]: { action: Action } };
+  stagedActionIds: number[];
+  skippedActionIds: number[];
+  committedState: any;
+  currentStateIndex: number;
+  computedStates: { state: any, error: any }[];
+}
 
 /**
 * Computes the next entry in the log by applying an action.
@@ -23,12 +34,7 @@ function computeNextEntry(reducer, action, state, error) {
     nextState = reducer(state, action);
   } catch (err) {
     nextError = err.toString();
-    if (typeof window === 'object' && typeof (<any>window).chrome !== 'undefined') {
-      // In Chrome, rethrowing provides better source map support
-      setTimeout(() => { throw err; });
-    } else {
-      console.error(err.stack || err);
-    }
+    console.error(err.stack || err);
   }
 
   return {
@@ -69,8 +75,8 @@ function recomputeStates(
 
     const shouldSkip = skippedActionIds.indexOf(actionId) > -1;
     const entry = shouldSkip ?
-    previousEntry :
-    computeNextEntry(reducer, action, previousState, previousError);
+      previousEntry :
+      computeNextEntry(reducer, action, previousState, previousError);
 
     nextComputedStates.push(entry);
   }
@@ -78,22 +84,8 @@ function recomputeStates(
   return nextComputedStates;
 }
 
-export interface LiftedState {
-  monitorState: any;
-  nextActionId: number;
-  actionsById: { [id: number]: { action: Action } };
-  stagedActionIds: number[];
-  skippedActionIds: number[];
-  committedState: any;
-  currentStateIndex: number;
-  computedStates: { state: any, error: any }[];
-}
-
-/**
-* Creates a history state reducer from an app's reducer.
-*/
-export function liftReducerWith(reducer, initialCommittedState?: any, monitorReducer?: any) {
-  const initialLiftedState: LiftedState = {
+export function liftInitialState(initialCommittedState?: any, monitorReducer?: any): LiftedState {
+  return {
     monitorState: monitorReducer(undefined, {}),
     nextActionId: 1,
     actionsById: { 0: liftAction(INIT_ACTION) },
@@ -103,11 +95,21 @@ export function liftReducerWith(reducer, initialCommittedState?: any, monitorRed
     currentStateIndex: 0,
     computedStates: []
   };
+}
 
+/**
+* Creates a history state reducer from an app's reducer.
+*/
+export function liftReducerWith(
+  initialCommittedState: any,
+  initialLiftedState: LiftedState,
+  monitorReducer?: any,
+  options: { maxAge?: number } = {}
+) {
   /**
   * Manages how the history actions modify the history state.
   */
-  return (liftedState = initialLiftedState, liftedAction): LiftedState => {
+  return reducer => (liftedState, liftedAction) => {
     let {
       monitorState,
       actionsById,
@@ -117,7 +119,37 @@ export function liftReducerWith(reducer, initialCommittedState?: any, monitorRed
       committedState,
       currentStateIndex,
       computedStates
-    } = liftedState;
+    } = liftedState || initialLiftedState;
+
+    if (!liftedState) {
+      // Prevent mutating initialLiftedState
+      actionsById = Object.create(actionsById);
+    }
+
+    function commitExcessActions(n) {
+      // Auto-commits n-number of excess actions.
+      let excess = n;
+      let idsToDelete = stagedActionIds.slice(1, excess + 1);
+
+      for (let i = 0; i < idsToDelete.length; i++) {
+        if (computedStates[i + 1].error) {
+          // Stop if error is found. Commit actions up to error.
+          excess = i;
+          idsToDelete = stagedActionIds.slice(1, excess + 1);
+          break;
+        } else {
+          delete actionsById[idsToDelete[i]];
+        }
+      }
+
+      skippedActionIds = skippedActionIds.filter(id => idsToDelete.indexOf(id) === -1);
+      stagedActionIds = [0, ...stagedActionIds.slice(excess + 1)];
+      committedState = computedStates[excess].state;
+      computedStates = computedStates.slice(excess);
+      currentStateIndex = currentStateIndex > excess
+        ? currentStateIndex - excess
+        : 0;
+    }
 
     // By default, agressively recompute every state whatever happens.
     // This has O(n) performance, so we'll override this to a sensible
@@ -173,6 +205,22 @@ export function liftReducerWith(reducer, initialCommittedState?: any, monitorRed
         minInvalidatedStateIndex = stagedActionIds.indexOf(actionId);
         break;
       }
+      case ActionTypes.SET_ACTIONS_ACTIVE: {
+        // Toggle whether an action with given ID is skipped.
+        // Being skipped means it is a no-op during the computation.
+        const { start, end, active } = liftedAction;
+        const actionIds = [];
+        for (let i = start; i < end; i++) actionIds.push(i);
+        if (active) {
+          skippedActionIds = difference(skippedActionIds, actionIds);
+        } else {
+          skippedActionIds = [...skippedActionIds, ...actionIds];
+        }
+
+        // Optimization: we know history before this action hasn't changed
+        minInvalidatedStateIndex = stagedActionIds.indexOf(start);
+        break;
+      }
       case ActionTypes.JUMP_TO_STATE: {
         // Without recomputing anything, move the pointer that tell us
         // which state is considered the current one. Useful for sliders.
@@ -189,6 +237,11 @@ export function liftReducerWith(reducer, initialCommittedState?: any, monitorRed
         break;
       }
       case ActionTypes.PERFORM_ACTION: {
+        // Auto-commit as new actions come in.
+        if (options.maxAge && stagedActionIds.length === options.maxAge) {
+          commitExcessActions(1);
+        }
+
         if (currentStateIndex === stagedActionIds.length - 1) {
           currentStateIndex++;
         }
@@ -215,9 +268,29 @@ export function liftReducerWith(reducer, initialCommittedState?: any, monitorRed
         } = liftedAction.nextLiftedState);
         break;
       }
-      case '@@ngrx/INIT': {
+      case Reducer.REPLACE:
+      case Dispatcher.INIT: {
         // Always recompute states on hot reload and init.
         minInvalidatedStateIndex = 0;
+
+        if (options.maxAge && stagedActionIds.length > options.maxAge) {
+          // States must be recomputed before committing excess.
+          computedStates = recomputeStates(
+            computedStates,
+            minInvalidatedStateIndex,
+            reducer,
+            committedState,
+            actionsById,
+            stagedActionIds,
+            skippedActionIds
+          );
+
+          commitExcessActions(stagedActionIds.length - options.maxAge);
+
+          // Avoid double computation.
+          minInvalidatedStateIndex = Infinity;
+        }
+
         break;
       }
       default: {
@@ -238,6 +311,7 @@ export function liftReducerWith(reducer, initialCommittedState?: any, monitorRed
       skippedActionIds
     );
     monitorState = monitorReducer(monitorState, liftedAction);
+
     return {
       monitorState,
       actionsById,
