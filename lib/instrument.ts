@@ -7,7 +7,7 @@ import { Extension, REDUX_DEVTOOLS_EXTENSION } from './extension';
 const REDUX_DEVTOOLS_EXTENSION_PROVIDER = {
   provide: REDUX_DEVTOOLS_EXTENSION,
   useFactory() {
-    if (window && (window as any).devToolsExtension) {
+    if (typeof window !== 'undefined' && (window as any).devToolsExtension) {
       return (window as any).devToolsExtension;
     }
 
