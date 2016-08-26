@@ -11,15 +11,18 @@ Devtools for [@ngrx/store](https://github.com/ngrx/store).
 To instrument @ngrx/store and use the devtools, you will need to setup the instrumentation providers using `instrumentStore()`:
 
 ```ts
-import {instrumentStore} from '@ngrx/store-devtools';
+import {StoreDevtoolsModule} from '@ngrx/store-devtools';
 
-bootstrap(App, [
-  provideStore(reducer),
-  instrumentStore({
-    monitor: monitorReducer,
-    maxAge: 5
-  })
-]);
+@NgModule({
+  imports: [
+    StoreModule.provideStore(rootReducer),
+    // Note that you must instrument after importing StoreModule
+    StoreDevtoolsModule.instrumentStore({
+      maxAge: 5,
+      monitor: monitorReducer
+    })
+  ]
+})
 ```
 
 See [@ngrx/store-log-monitor](https://github.com/ngrx/store-log-monitor) for an example monitor built for Angular 2

@@ -9,16 +9,19 @@ import 'rxjs/add/operator/observeOn';
 import { Observer } from 'rxjs/Observer';
 import { Observable } from 'rxjs/Observable';
 import { queue } from 'rxjs/scheduler/queue';
-import { Dispatcher, Reducer } from '@ngrx/store';
+import { State, INITIAL_STATE, INITIAL_REDUCER, Dispatcher, Reducer } from '@ngrx/store';
+import { Injectable, Inject } from '@angular/core';
 
 import { liftReducerWith, liftInitialState, LiftedState } from './reducer';
 import { StoreDevtoolActions as actions } from './actions';
 import { liftAction, unliftState } from './utils';
-import { Options } from './config';
-import { Extension } from './extension';
+import { StoreDevtoolsConfig, STORE_DEVTOOLS_CONFIG } from './config';
+import { DevtoolsExtension } from './extension';
 
+@Injectable()
 export class DevtoolsDispatcher extends Dispatcher { }
 
+@Injectable()
 export class StoreDevtools implements Observer<any> {
   public dispatcher: Dispatcher;
   public liftedState: Observable<LiftedState>;
@@ -28,13 +31,13 @@ export class StoreDevtools implements Observer<any> {
     dispatcher: DevtoolsDispatcher,
     actions$: Dispatcher,
     reducers$: Reducer,
-    initialState: any,
-    options: Options,
-    extension: Extension
+    extension: DevtoolsExtension,
+    @Inject(INITIAL_STATE) initialState: any,
+    @Inject(STORE_DEVTOOLS_CONFIG) config: StoreDevtoolsConfig
   ) {
-    const liftedInitialState = liftInitialState(initialState, options.monitor);
-    const liftReducer = liftReducerWith(initialState, liftedInitialState, options.monitor, {
-      maxAge: options.maxAge
+    const liftedInitialState = liftInitialState(initialState, config.monitor);
+    const liftReducer = liftReducerWith(initialState, liftedInitialState, config.monitor, {
+      maxAge: config.maxAge
     });
 
     const liftedActions$ = actions$

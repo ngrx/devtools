@@ -1,17 +1,18 @@
 import 'rxjs/add/operator/take';
 import { Subscription } from 'rxjs/Subscription';
 import { ReflectiveInjector } from '@angular/core';
-import { provideStore, Store, State, ActionReducer } from '@ngrx/store';
+import { TestBed, getTestBed } from '@angular/core/testing';
+import { StoreModule, Store, State, ActionReducer } from '@ngrx/store';
 
-import { StoreDevtools, instrumentStore, LiftedState, Options } from '../lib';
+import { StoreDevtools, StoreDevtoolsModule, LiftedState, Options } from '../src';
 
-function counter(state = 0, action) {
+const counter = jasmine.createSpy('counter').and.callFake(function (state = 0, action) {
   switch (action.type) {
   case 'INCREMENT': return state + 1;
   case 'DECREMENT': return state - 1;
   default: return state;
   }
-}
+});
 
 declare var mistake;
 function counterWithBug(state = 0, action) {
@@ -42,20 +43,26 @@ function doubleCounter(state = 0, action) {
 
 type Fixture<T> = {
   store: Store<T>;
+  state: State<T>;
   devtools: StoreDevtools;
   cleanup: () => void;
   getState: () => T;
   getLiftedState: () => LiftedState;
+  replaceReducer: (reducer) => void;
 };
 
 function createStore<T>(reducer: ActionReducer<T>, options: Options = {}): Fixture<T> {
-  const injector = ReflectiveInjector.resolveAndCreate([
-    provideStore(reducer),
-    instrumentStore(options)
-  ]);
+  TestBed.configureTestingModule({
+    imports: [
+      StoreModule.provideStore(reducer),
+      StoreDevtoolsModule.instrumentStore(options)
+    ]
+  });
 
-  const store: Store<T> = injector.get(Store);
-  const devtools: StoreDevtools = injector.get(StoreDevtools);
+  const testbed: TestBed = getTestBed();
+  const store: Store<T> = testbed.get(Store);
+  const devtools: StoreDevtools = testbed.get(StoreDevtools);
+  const state: State<T> = testbed.get(State);
   let liftedValue: LiftedState;
   let value: T;
 
@@ -70,8 +77,12 @@ function createStore<T>(reducer: ActionReducer<T>, options: Options = {}): Fixtu
     stateSub.unsubscribe();
   };
 
+  const replaceReducer = reducer => {
+    store.replaceReducer(reducer);
+  };
 
-  return { store, devtools, cleanup, getState, getLiftedState };
+
+  return { store, state, devtools, cleanup, getState, getLiftedState, replaceReducer };
 }
 
 describe('Store Devtools', () => {
@@ -95,15 +106,7 @@ describe('Store Devtools', () => {
     });
 
     it('should alias devtools unlifted state to Store\'s state', () => {
-      const injector = ReflectiveInjector.resolveAndCreate([
-        provideStore(counter),
-        instrumentStore()
-      ]);
-
-      const devtools: StoreDevtools = injector.get(StoreDevtools);
-      const state = injector.get(State);
-
-      expect(devtools.state).toBe(state);
+      expect(devtools.state).toBe(fixture.state);
     });
 
     it('should perform actions', () => {
@@ -219,23 +222,23 @@ describe('Store Devtools', () => {
       store.dispatch({ type: 'INCREMENT' });
       store.dispatch({ type: 'DECREMENT' });
       store.dispatch({ type: 'INCREMENT' });
+
       expect(getState()).toBe(1);
 
-      store.replaceReducer(doubleCounter);
+      fixture.replaceReducer(doubleCounter);
+
       expect(getState()).toBe(2);
     });
 
     it('should catch and record errors', () => {
       spyOn(console, 'error');
-      let { store, devtools } = createStore(counterWithBug);
-      let value: LiftedState;
-      let sub = devtools.liftedState.subscribe(s => value = s);
+      fixture.replaceReducer(counterWithBug);
 
       store.dispatch({ type: 'INCREMENT' });
       store.dispatch({ type: 'DECREMENT' });
       store.dispatch({ type: 'INCREMENT' });
 
-      let { computedStates } = value;
+      let { computedStates } = fixture.getLiftedState();
       expect(computedStates[2].error).toMatch(
         /ReferenceError/
       );
@@ -244,8 +247,6 @@ describe('Store Devtools', () => {
       );
 
       expect(console.error).toHaveBeenCalled();
-
-      sub.unsubscribe();
     });
 
     it('should catch invalid action type', () => {
@@ -258,91 +259,89 @@ describe('Store Devtools', () => {
     });
 
     it('should not recompute old states when toggling an action', () => {
-      let reducerCalls = 0;
-      let {store, devtools} = createStore(() => reducerCalls++);
-      reducerCalls = 1; // @ngrx/store calls the reducer during setup
+      counter.calls.reset();
 
-      expect(reducerCalls).toBe(1);
-      // actionId 0 = @@INIT
       store.dispatch({ type: 'INCREMENT' });
       store.dispatch({ type: 'INCREMENT' });
       store.dispatch({ type: 'INCREMENT' });
-      expect(reducerCalls).toBe(4);
+
+      expect(counter).toHaveBeenCalledTimes(3);
 
       devtools.toggleAction(3);
-      expect(reducerCalls).toBe(4);
+      expect(counter).toHaveBeenCalledTimes(3);
 
       devtools.toggleAction(3);
-      expect(reducerCalls).toBe(5);
+      expect(counter).toHaveBeenCalledTimes(4);
 
       devtools.toggleAction(2);
-      expect(reducerCalls).toBe(6);
+      expect(counter).toHaveBeenCalledTimes(5);
 
       devtools.toggleAction(2);
-      expect(reducerCalls).toBe(8);
+      expect(counter).toHaveBeenCalledTimes(7);
 
       devtools.toggleAction(1);
-      expect(reducerCalls).toBe(10);
+      expect(counter).toHaveBeenCalledTimes(9);
 
       devtools.toggleAction(2);
-      expect(reducerCalls).toBe(11);
+      expect(counter).toHaveBeenCalledTimes(10);
 
       devtools.toggleAction(3);
-      expect(reducerCalls).toBe(11);
+      expect(counter).toHaveBeenCalledTimes(10);
 
       devtools.toggleAction(1);
-      expect(reducerCalls).toBe(12);
+      expect(counter).toHaveBeenCalledTimes(11);
 
       devtools.toggleAction(3);
-      expect(reducerCalls).toBe(13);
+      expect(counter).toHaveBeenCalledTimes(12);
 
       devtools.toggleAction(2);
-      expect(reducerCalls).toBe(15);
+      expect(counter).toHaveBeenCalledTimes(14);
     });
 
     it('should not recompute states when jumping to state', () => {
-      let reducerCalls = 0;
-      let {store, devtools} = createStore(() => reducerCalls++);
-      reducerCalls = 1; // @ngrx/store calls the reducer during setup
+      counter.calls.reset();
 
-      expect(reducerCalls).toBe(1);
       store.dispatch({ type: 'INCREMENT' });
       store.dispatch({ type: 'INCREMENT' });
       store.dispatch({ type: 'INCREMENT' });
-      expect(reducerCalls).toBe(4);
+
+      expect(counter).toHaveBeenCalledTimes(3);
 
       let savedComputedStates = getLiftedState().computedStates;
 
       devtools.jumpToState(0);
-      expect(reducerCalls).toBe(4);
+
+      expect(counter).toHaveBeenCalledTimes(3);
 
       devtools.jumpToState(1);
-      expect(reducerCalls).toBe(4);
+
+      expect(counter).toHaveBeenCalledTimes(3);
 
       devtools.jumpToState(3);
-      expect(reducerCalls).toBe(4);
+
+      expect(counter).toHaveBeenCalledTimes(3);
 
       expect(getLiftedState().computedStates).toBe(savedComputedStates);
     });
 
     it('should not recompute states on monitor actions', () => {
-      let reducerCalls = 0;
-      let {store, devtools} = createStore(() => reducerCalls++);
-      reducerCalls = 1; // @ngrx/store calls the reducer during setup
+      counter.calls.reset();
 
-      expect(reducerCalls).toBe(1);
       store.dispatch({ type: 'INCREMENT' });
       store.dispatch({ type: 'INCREMENT' });
       store.dispatch({ type: 'INCREMENT' });
-      expect(reducerCalls).toBe(4);
+
+      expect(counter).toHaveBeenCalledTimes(3);
 
       let savedComputedStates = getLiftedState().computedStates;
 
       devtools.dispatch({ type: 'lol' });
-      expect(reducerCalls).toBe(4);
+
+      expect(counter).toHaveBeenCalledTimes(3);
 
       devtools.dispatch({ type: 'wat' });
-      expect(reducerCalls).toBe(4);
+
+      expect(counter).toHaveBeenCalledTimes(3);
 
       expect(getLiftedState().computedStates).toBe(savedComputedStates);
     });

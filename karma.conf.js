@@ -9,13 +9,13 @@ module.exports = function(karma) {
     frameworks: ['jasmine'],
 
     files: [
-      { pattern: 'tests.js', watched: false }
+      { pattern: 'tests.ts', watched: false }
     ],
 
     exclude: [],
 
     preprocessors: {
-      'tests.js': ['coverage', 'webpack', 'sourcemap']
+      'tests.ts': ['coverage', 'webpack', 'sourcemap']
     },
 
     reporters: ['mocha', 'coverage'],
@@ -50,27 +50,21 @@ module.exports = function(karma) {
           {
             test: /\.ts?$/,
             exclude: /(node_modules)/,
-            loader: 'ts-loader?target=es5&module=commonjs'
+            loader: 'awesome-typescript'
           }
         ],
         postLoaders: [
           {
             test: /\.(js|ts)$/, loader: 'istanbul-instrumenter-loader',
-            include: path.resolve(__dirname, 'lib'),
+            include: path.resolve(__dirname, 'src'),
             exclude: [
               /\.(e2e|spec)\.ts$/,
+              /tests.ts$/,
               /node_modules/
             ]
           }
         ]
-      },
-      ts: {
-        configFileName: './spec/tsconfig.json'
       }
-    },
-
-    webpackServer: {
-      noInfo: true
     }
   });
 };

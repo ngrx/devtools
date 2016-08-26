@@ -1,20 +1,22 @@
 {
-  "version": "1.8.0",
+  "version": "2.0.0",
   "compileOnSave": false,
   "compilerOptions": {
-    "outDir": "./release/esm",
-    "target": "es6",
+    "outDir": "./release",
+    "target": "es5",
+    "module": "commonjs",
     "sourceMap": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "removeComments": false,
     "moduleResolution": "node",
-    "declaration": true
+    "declaration": true,
+    "lib": ["dom", "es5", "es2015"]
   },
-  "exclude": [
-    "node_modules",
-    "spec",
-    "typings",
-    "release"
-  ]
+  "include": [
+    "src/**/*.ts"
+  ],
+  "angularCompilerOptions": {
+    "genDir": ".ngc"
+  }
 }

@@ -4,6 +4,7 @@ import 'rxjs/add/operator/switchMapTo';
 import 'rxjs/add/operator/takeUntil';
 import 'rxjs/add/operator/share';
 import { Observable } from 'rxjs/Observable';
+import { OpaqueToken, Inject, Injectable } from '@angular/core';
 
 import { ActionTypes } from './actions';
 import { unliftState, unliftAction } from './utils';
@@ -16,7 +17,7 @@ export const ExtensionActionTypes = {
   ACTION: 'ACTION'
 };
 
-export const REDUX_DEVTOOLS_EXTENSION = new String('Redux Devtools Extension');
+export const REDUX_DEVTOOLS_EXTENSION = new OpaqueToken('Redux Devtools Extension');
 
 export interface ReduxDevtoolsExtensionConnection {
   subscribe(listener: (change: any) => void);
@@ -30,15 +31,18 @@ export interface ReduxDevtoolsExtension {
 }
 
 
-export class Extension {
+@Injectable()
+export class DevtoolsExtension {
   private instanceId = `ngrx-store-${Date.now()}`;
+  private devtoolsExtension: ReduxDevtoolsExtension;
 
   liftedActions$: Observable<any>;
   actions$: Observable<any>;
 
   constructor(
-    private devtoolsExtension: ReduxDevtoolsExtension
+    @Inject(REDUX_DEVTOOLS_EXTENSION) devtoolsExtension
   ) {
+    this.devtoolsExtension = devtoolsExtension;
     this.createActionStreams();
   }
 
