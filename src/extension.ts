@@ -65,7 +65,7 @@ export class DevtoolsExtension {
 
       connection.subscribe(change => subscriber.next(change));
 
-      return connection.unsubscribe();
+      return connection.unsubscribe;
     });
   }
 
