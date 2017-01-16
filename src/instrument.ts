@@ -62,7 +62,9 @@ export function _createReducerIfExtension(extension: any, injector: Injector) {
 export function _createExtensionOptions(): StoreDevtoolsConfig {
   return {
     maxAge: Infinity,
-    monitor: () => null
+    monitor: function() {
+      return null;
+    }
   };
 }
 
@@ -83,7 +85,9 @@ export function _createExtensionOptions(): StoreDevtoolsConfig {
 export class StoreDevtoolsModule {
   static instrumentStore(_options: StoreDevtoolsConfig = {}) {
     const DEFAULT_OPTIONS: StoreDevtoolsConfig = {
-      monitor: () => null
+      monitor: function() {
+        return null;
+      }
     };
 
     const options = Object.assign({}, DEFAULT_OPTIONS, _options);
