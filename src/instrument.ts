@@ -59,17 +59,23 @@ export function _createReducerIfExtension(extension: any, injector: Injector) {
   }
 }
 
-export function _createExtensionOptions(config = {}): StoreDevtoolsConfig {
-  const options = Object.assign({
+export function _createExtensionOptions(): StoreDevtoolsConfig {
+  return {
     maxAge: Infinity,
+    monitor: () => null
+  };
+}
+
+export function _createInstrumentOptions(config?: StoreDevtoolsConfig): StoreDevtoolsConfig {
+  const options = Object.assign({
     monitor: () => null
   }, config);
 
-  if (options.maxAge && options.maxAge < 2) {
+  if (options && options.maxAge && options.maxAge < 2) {
     throw new Error(`Devtools 'maxAge' cannot be less than 2, got ${options.maxAge}`);
   }
 
-  return options
+  return options;
 }
 
 @NgModule({
@@ -88,10 +94,6 @@ export function _createExtensionOptions(config = {}): StoreDevtoolsConfig {
 })
 export class StoreDevtoolsModule {
   static instrumentStore(options) {
-    if (options.maxAge && options.maxAge < 2) {
-      throw new Error(`Devtools 'maxAge' cannot be less than 2, got ${options.maxAge}`);
-    }
-
     return {
       ngModule: StoreDevtoolsModule,
       providers: [
@@ -109,7 +111,7 @@ export class StoreDevtoolsModule {
           deps: [ DevtoolsDispatcher, INITIAL_REDUCER ],
           useFactory: _createReducer
         },
-        { provide: STORE_DEVTOOLS_CONFIG, useFactory: _createExtensionOptions, deps: ['INSTRUMENT_OPTIONS'] }
+        { provide: STORE_DEVTOOLS_CONFIG, useFactory: _createInstrumentOptions, deps: ['INSTRUMENT_OPTIONS'] }
       ]
     };
   }
