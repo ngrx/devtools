@@ -348,7 +348,7 @@ describe('Store Devtools', () => {
   });
 
 
-  fdescribe('maxAge option', () => {
+  describe('maxAge option', () => {
     it('should auto-commit earliest non-@@INIT action when maxAge is reached', () => {
       const fixture = createStore(counter, function () { return { maxAge: 3 }});
 
