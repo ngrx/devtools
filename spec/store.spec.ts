@@ -51,7 +51,7 @@ type Fixture<T> = {
   replaceReducer: (reducer) => void;
 };
 
-function createStore<T>(reducer: ActionReducer<T>, options: StoreDevtoolsConfig = {}): Fixture<T> {
+function createStore<T>(reducer: ActionReducer<T>, options?: Function): Fixture<T> {
   TestBed.configureTestingModule({
     imports: [
       StoreModule.provideStore(reducer),
@@ -350,7 +350,7 @@ describe('Store Devtools', () => {
 
   describe('maxAge option', () => {
     it('should auto-commit earliest non-@@INIT action when maxAge is reached', () => {
-      const fixture = createStore(counter, { maxAge: 3 });
+      const fixture = createStore(counter, function () { return { maxAge: 3 }});
 
       fixture.store.dispatch({ type: 'INCREMENT' });
       fixture.store.dispatch({ type: 'INCREMENT' });
@@ -374,7 +374,7 @@ describe('Store Devtools', () => {
     });
 
     it('should remove skipped actions once committed', () => {
-      const fixture = createStore(counter, { maxAge: 3 });
+      const fixture = createStore(counter, function () { return { maxAge: 3 }});
 
       fixture.store.dispatch({ type: 'INCREMENT' });
       fixture.devtools.toggleAction(1);
@@ -388,7 +388,7 @@ describe('Store Devtools', () => {
 
     it('should not auto-commit errors', () => {
       spyOn(console, 'error');
-      const fixture = createStore(counterWithBug, { maxAge: 3 });
+      const fixture = createStore(counterWithBug, function () { return { maxAge: 3 }});
 
       fixture.store.dispatch({ type: 'DECREMENT' });
       fixture.store.dispatch({ type: 'INCREMENT' });
@@ -402,7 +402,7 @@ describe('Store Devtools', () => {
 
     it('should auto-commit actions after hot reload fixes error', () => {
       spyOn(console, 'error');
-      const fixture = createStore(counterWithBug, { maxAge: 3 });
+      const fixture = createStore(counterWithBug, function () { return { maxAge: 3 }});
 
       fixture.store.dispatch({ type: 'DECREMENT' });
       fixture.store.dispatch({ type: 'DECREMENT' });
@@ -424,7 +424,7 @@ describe('Store Devtools', () => {
     });
 
     it('should update currentStateIndex when auto-committing', () => {
-      const fixture = createStore(counter, { maxAge: 3 });
+      const fixture = createStore(counter, function () { return { maxAge: 3 }});
 
       fixture.store.dispatch({ type: 'INCREMENT' });
       fixture.store.dispatch({ type: 'INCREMENT' });
@@ -444,7 +444,7 @@ describe('Store Devtools', () => {
 
     it('should continue to increment currentStateIndex while error blocks commit', () => {
       spyOn(console, 'error');
-      const fixture = createStore(counterWithBug, { maxAge: 3 });
+      const fixture = createStore(counterWithBug, function () { return { maxAge: 3 }});
 
       fixture.store.dispatch({ type: 'DECREMENT' });
       fixture.store.dispatch({ type: 'DECREMENT' });
@@ -462,7 +462,7 @@ describe('Store Devtools', () => {
 
     it('should adjust currentStateIndex correctly when multiple actions are committed', () => {
       spyOn(console, 'error');
-      const fixture = createStore(counterWithBug, { maxAge: 3 });
+      const fixture = createStore(counterWithBug, function () { return { maxAge: 3 }});
 
       fixture.store.dispatch({ type: 'DECREMENT' });
       fixture.store.dispatch({ type: 'DECREMENT' });
@@ -481,7 +481,7 @@ describe('Store Devtools', () => {
 
     it('should not allow currentStateIndex to drop below 0', () => {
       spyOn(console, 'error');
-      const fixture = createStore(counterWithBug, { maxAge: 3 });
+      const fixture = createStore(counterWithBug, function () { return { maxAge: 3 }});
 
       fixture.store.dispatch({ type: 'DECREMENT' });
       fixture.store.dispatch({ type: 'DECREMENT' });
@@ -501,7 +501,12 @@ describe('Store Devtools', () => {
 
     it('should throw error when maxAge < 2', () => {
       expect(() => {
-        createStore(counter, { maxAge: 1 });
+        createStore(counter, function () {
+          return {
+            maxAge: 1
+          };
+        });
+
       }).toThrowError(/cannot be less than/);
     });
   });
