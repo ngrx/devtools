@@ -504,6 +504,14 @@ describe('Store Devtools', () => {
         createStore(counter, { maxAge: 1 });
       }).toThrowError(/cannot be less than/);
     });
+
+    it('should support a function to return devtools options', () => {
+      expect(() => {
+        createStore(counter, function() {
+          return { maxAge: 1 };
+        });
+      }).toThrowError(/cannot be less than/);
+    });
   });
 
   describe('Import State', () => {

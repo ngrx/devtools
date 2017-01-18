@@ -21,14 +21,17 @@ Devtools for [@ngrx/store](https://github.com/ngrx/store).
   @NgModule({
     imports: [
       StoreModule.provideStore(rootReducer),
-      StoreDevtoolsModule.instrumentOnlyWithExtension()
+      // Note that you must instrument after importing StoreModule
+      StoreDevtoolsModule.instrumentOnlyWithExtension({
+        maxAge: 5
+      })
     ]
   })
   export class AppModule { }
   ```
 
 ### Instrumentation with a Custom Monitor
-To instrument @ngrx/store and use the devtools with a custom monitor you will need to setup the 
+To instrument @ngrx/store and use the devtools with a custom monitor you will need to setup the
 instrumentation providers using `instrumentStore()`:
 
 ```ts

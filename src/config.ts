@@ -7,3 +7,5 @@ export interface StoreDevtoolsConfig {
 }
 
 export const STORE_DEVTOOLS_CONFIG = new OpaqueToken('@ngrx/devtools Options');
+
+export const INITIAL_OPTIONS = new OpaqueToken('@ngrx/devtools Initial Config');
