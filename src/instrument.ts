@@ -126,12 +126,12 @@ export class StoreDevtoolsModule {
       providers: [
         {
           provide: State,
-          deps: [ REDUX_DEVTOOLS_EXTENSION, Injector ],
+          deps: [ REDUX_DEVTOOLS_EXTENSION, Injector, INITIAL_STATE ],
           useFactory: _createStateIfExtension
         },
         {
           provide: Reducer,
-          deps: [ REDUX_DEVTOOLS_EXTENSION, Injector ],
+          deps: [ REDUX_DEVTOOLS_EXTENSION, Injector, INITIAL_REDUCER ],
           useFactory: _createReducerIfExtension
         },
         {
