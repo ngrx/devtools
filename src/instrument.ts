@@ -29,14 +29,13 @@ export function _createReducer(dispatcher: DevtoolsDispatcher, reducer) {
   return new Reducer(dispatcher, reducer);
 }
 
-export function _createStateIfExtension(extension: any, injector: Injector) {
+export function _createStateIfExtension(extension: any, injector: Injector, initialState: any) {
   if (!!extension) {
     const devtools: StoreDevtools = injector.get(StoreDevtools);
 
     return _createState(devtools);
   }
   else {
-    const initialState: any = injector.get(INITIAL_STATE);
     const dispatcher: Dispatcher = injector.get(Dispatcher);
     const reducer: Reducer = injector.get(Reducer);
 
@@ -44,16 +43,14 @@ export function _createStateIfExtension(extension: any, injector: Injector) {
   }
 }
 
-export function _createReducerIfExtension(extension: any, injector: Injector) {
+export function _createReducerIfExtension(extension: any, injector: Injector, reducer: any) {
   if (!!extension) {
     const devtoolsDispatcher: DevtoolsDispatcher = injector.get(DevtoolsDispatcher);
-    const reducer: any = injector.get(INITIAL_REDUCER);
 
     return _createReducer(devtoolsDispatcher, reducer);
   }
   else {
     const dispatcher: Dispatcher = injector.get(Dispatcher);
-    const reducer: any = injector.get(INITIAL_REDUCER);
 
     return new Reducer(dispatcher, reducer);
   }
