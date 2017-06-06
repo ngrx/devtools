@@ -5,7 +5,7 @@
 Devtools for [@ngrx/store](https://github.com/ngrx/store).
 
 ## Installation
-`npm install @ngrx/store-devtools --save`
+`npm install @ngrx/store-devtools --save-dev`
 
 
 ## Instrumentation
