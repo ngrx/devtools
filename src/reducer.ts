@@ -15,6 +15,7 @@ export interface LiftedState {
   committedState: any;
   currentStateIndex: number;
   computedStates: { state: any, error: any }[];
+  dropNewActions: boolean;
 }
 
 /**
@@ -93,7 +94,8 @@ export function liftInitialState(initialCommittedState?: any, monitorReducer?: a
     skippedActionIds: [],
     committedState: initialCommittedState,
     currentStateIndex: 0,
-    computedStates: []
+    computedStates: [],
+    dropNewActions: false,
   };
 }
 
@@ -118,7 +120,8 @@ export function liftReducerWith(
       skippedActionIds,
       committedState,
       currentStateIndex,
-      computedStates
+      computedStates,
+      dropNewActions,
     } = liftedState || initialLiftedState;
 
     if (!liftedState) {
@@ -237,6 +240,10 @@ export function liftReducerWith(
         break;
       }
       case ActionTypes.PERFORM_ACTION: {
+        if (dropNewActions) {
+          return liftedState || initialLiftedState;
+        }
+
         // Auto-commit as new actions come in.
         if (options.maxAge && stagedActionIds.length === options.maxAge) {
           commitExcessActions(1);
@@ -266,6 +273,11 @@ export function liftReducerWith(
           currentStateIndex,
           computedStates
         } = liftedAction.nextLiftedState);
+        break;
+      }
+      case ActionTypes.LOCK_CHANGES: {
+        dropNewActions = liftedAction.status;
+        minInvalidatedStateIndex = Infinity;
         break;
       }
       case Reducer.REPLACE:
@@ -320,7 +332,8 @@ export function liftReducerWith(
       skippedActionIds,
       committedState,
       currentStateIndex,
-      computedStates
+      computedStates,
+      dropNewActions,
     };
   };
 }

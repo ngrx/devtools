@@ -7,7 +7,8 @@ export const ActionTypes = {
   TOGGLE_ACTION: 'TOGGLE_ACTION',
   SET_ACTIONS_ACTIVE: 'SET_ACTIONS_ACTIVE',
   JUMP_TO_STATE: 'JUMP_TO_STATE',
-  IMPORT_STATE: 'IMPORT_STATE'
+  IMPORT_STATE: 'IMPORT_STATE',
+  LOCK_CHANGES: 'LOCK_CHANGES',
 };
 
 /**
@@ -55,5 +56,9 @@ export const StoreDevtoolActions = {
 
   importState(nextLiftedState) {
     return { type: ActionTypes.IMPORT_STATE, nextLiftedState };
-  }
+  },
+
+  lockChanges(status) {
+    return { type: ActionTypes.LOCK_CHANGES, status };
+  },
 };
