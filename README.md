@@ -1,10 +1,10 @@
+---
+# This repository is for version 3.x of of @ngrx/store-devtools.
+# [Click here for the latest version (4.x)](https://github.com/ngrx/platform)
+---
+
 # @ngrx/store-devtools
 Devtools for [@ngrx/store](https://github.com/ngrx/store).
-
----
-#### This repository is for version 3.x of of @ngrx/store-devtools.
-#### [Click here for the latest version (4.x)](https://github.com/ngrx/platform)
----
 
 [![Join the chat at https://gitter.im/ngrx/store](https://badges.gitter.im/ngrx/store.svg)](https://gitter.im/ngrx/store?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
