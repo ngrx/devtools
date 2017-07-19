@@ -15,7 +15,7 @@ export interface LiftedState {
   committedState: any;
   currentStateIndex: number;
   computedStates: { state: any, error: any }[];
-  dropNewActions: boolean;
+  isLocked: boolean;
 }
 
 /**
@@ -95,7 +95,7 @@ export function liftInitialState(initialCommittedState?: any, monitorReducer?: a
     committedState: initialCommittedState,
     currentStateIndex: 0,
     computedStates: [],
-    dropNewActions: false,
+    isLocked: false,
   };
 }
 
@@ -121,7 +121,7 @@ export function liftReducerWith(
       committedState,
       currentStateIndex,
       computedStates,
-      dropNewActions,
+      isLocked,
     } = liftedState || initialLiftedState;
 
     if (!liftedState) {
@@ -240,7 +240,7 @@ export function liftReducerWith(
         break;
       }
       case ActionTypes.PERFORM_ACTION: {
-        if (dropNewActions) {
+        if (isLocked) {
           return liftedState || initialLiftedState;
         }
 
@@ -276,7 +276,7 @@ export function liftReducerWith(
         break;
       }
       case ActionTypes.LOCK_CHANGES: {
-        dropNewActions = liftedAction.status;
+        isLocked = liftedAction.status;
         minInvalidatedStateIndex = Infinity;
         break;
       }
@@ -333,7 +333,7 @@ export function liftReducerWith(
       committedState,
       currentStateIndex,
       computedStates,
-      dropNewActions,
+      isLocked,
     };
   };
 }

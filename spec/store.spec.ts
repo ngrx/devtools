@@ -560,7 +560,7 @@ describe('Store Devtools', () => {
     it('should lock', () => {
       fixture.store.dispatch({ type: 'INCREMENT' });
       fixture.devtools.lockChanges(true);
-      expect(fixture.getLiftedState().dropNewActions).toBe(true);
+      expect(fixture.getLiftedState().isLocked).toBe(true);
       expect(fixture.getLiftedState().nextActionId).toBe(2);
       expect(fixture.getState()).toBe(1);
 
@@ -574,7 +574,7 @@ describe('Store Devtools', () => {
       expect(fixture.getState()).toBe(1);
 
       fixture.devtools.lockChanges(false);
-      expect(fixture.getLiftedState().dropNewActions).toBe(false);
+      expect(fixture.getLiftedState().isLocked).toBe(false);
       expect(fixture.getLiftedState().nextActionId).toBe(2);
 
       fixture.store.dispatch({ type: 'INCREMENT' });
