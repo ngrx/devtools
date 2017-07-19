@@ -51,7 +51,7 @@ export class StoreDevtools implements Observer<any> {
 
     const liftedReducer$ = map.call(reducers$, liftReducer);
 
-    const liftedStateSubject = new ReplaySubject(1);
+    const liftedStateSubject = new ReplaySubject<LiftedState>(1);
     const liftedStateSubscription = applyOperators(liftedAction$, [
       [ withLatestFrom, liftedReducer$ ],
       [ scan, (liftedState, [ action, reducer ]) => {
@@ -114,5 +114,9 @@ export class StoreDevtools implements Observer<any> {
 
   importState(nextLiftedState: any) {
     this.dispatch(actions.importState(nextLiftedState));
+  }
+
+  lockChanges(status: any) {
+    this.dispatch(actions.lockChanges(status));
   }
 }
